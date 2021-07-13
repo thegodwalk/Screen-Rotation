@@ -9,17 +9,12 @@ Function Set-ScreenResolutionAndOrientation {
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
             public struct DISPLAY_DEVICE
             {
-                [MarshalAs(UnmanagedType.U4)]
-                public int cb;
-                [MarshalAs(UnmanagedType.ByValTStr, SizeConst=32)]
+                
+                public uint cb;
                 public string DeviceName;
-                [MarshalAs(UnmanagedType.ByValTStr, SizeConst=128)]
                 public byte DeviceString;
-                [MarshalAs(UnmanagedType.U4)]
                 public uint StateFlags;
-                [MarshalAs(UnmanagedType.ByValTStr, SizeConst=128)]
                 public byte DeviceID;
-                [MarshalAs(UnmanagedType.ByValTStr, SizeConst=128)]
                 public byte DeviceKey;
                 
             };
@@ -67,7 +62,7 @@ Function Set-ScreenResolutionAndOrientation {
         class NativeMethods 
         { 
             [DllImport("user32.dll")]
-            public static extern int EnumDisplayDevices(string DeviceName,uint DevNum,ref DISPLAY_DEVICE DispDev,uint dwFlags);
+            public static extern int EnumDisplayDevices(string DeviceName,int DevNum,ref DISPLAY_DEVICE DispDev,uint dwFlags);
             [DllImport("user32.dll")] 
             public static extern int EnumDisplaySettings(string deviceName, int modeNum, ref DEVMODE devMode); 
             [DllImport("user32.dll")] 
@@ -96,16 +91,15 @@ Function Set-ScreenResolutionAndOrientation {
             { 
     
                 DEVMODE dm = GetDevMode(); 
-                DISPLAY_DEVICE dd = new DISPLAY_DEVICE();
-                dd.cb =(byte)Marshal.SizeOf(dd);
+                DISPLAY_DEVICE dd = GETDD();
                 
                     
                     
             
     
     
-                    NativeMethods.EnumDisplayDevices(null,0,ref dd,0x00000001);
-                    NativeMethods.EnumDisplayDevices(dd.DeviceName,0,ref dd,0x00000001);
+                    NativeMethods.EnumDisplayDevices(null,0,ref dd,0);
+                    NativeMethods.EnumDisplayDevices(dd.DeviceName,0,ref dd,0);
                 
     
                 if (0 != NativeMethods.EnumDisplaySettings(dd.DeviceName, NativeMethods.ENUM_CURRENT_SETTINGS, ref dm)) 
@@ -181,7 +175,12 @@ Function Set-ScreenResolutionAndOrientation {
                 dm.dmSize = (short)Marshal.SizeOf(dm); 
                 return dm; 
             } 
-           
+            private static DISPLAY_DEVICE GETDD() 
+                { 
+                    DISPLAY_DEVICE dd = new DISPLAY_DEVICE(); 
+                    dd.cb = (uint)Marshal.SizeOf(dd); 
+                    return dd;
+                }
             
         } 
     }   
