@@ -10,7 +10,7 @@ Function Set-ScreenResolutionAndOrientation {
             public struct DISPLAY_DEVICE
             {
                 
-                public uint cb;
+                public byte cb;
                 public string DeviceName;
                 public byte DeviceString;
                 public uint StateFlags;
@@ -178,7 +178,7 @@ Function Set-ScreenResolutionAndOrientation {
             private static DISPLAY_DEVICE GETDD() 
                 { 
                     DISPLAY_DEVICE dd = new DISPLAY_DEVICE(); 
-                    dd.cb = (uint)Marshal.SizeOf(dd); 
+                    dd.cb = (byte)Marshal.SizeOf(dd); 
                     return dd;
                 }
             
